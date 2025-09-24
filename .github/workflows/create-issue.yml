@@ -1,0 +1,49 @@
+name: Criar branch e gerenciar issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  criar_e_gerenciar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Adicionar ao projeto
+        uses: actions/add-to-project@v1.0.0
+        with:
+          project-url: 'https://github.com/orgs/FIAP-7/projects/3'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          labeled: 'Status: Backlog'
+
+      - name: Atribuir label
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Status: Backlog']
+            })
+
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      - name: Extrair dados da issue
+        id: dados_issue
+        run: |
+          echo "numero=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          echo "titulo=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
+
+      - name: Configurar Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Criar nova branch com commit inicial
+        run: |
+          git checkout -b "#${{ steps.dados_issue.outputs.numero }}"
+          echo "#${{ steps.dados_issue.outputs.numero }} - ${{ steps.dados_issue.outputs.titulo }}" > "ISSUE-${{ steps.dados_issue.outputs.numero }}.md"
+          git add "ISSUE-${{ steps.dados_issue.outputs.numero }}.md"
+          git commit -m "chore: ${{ steps.dados_issue.outputs.titulo }} (#${{ steps.dados_issue.outputs.numero }})"
+          git push origin "#${{ steps.dados_issue.outputs.numero }}"
