@@ -1,6 +1,6 @@
-#3 - Setup projeto
+# 3 - Setup projeto
 
-PROMPT: 
+PROMPT:
 Faça um system design completo a partir da descrição de trabalho anexada no pdf. Comece entendendo o problema e fazendo perguntas de clarificação quando necessario para estabelecer o escopo. Faça o design das APIs, especificando endpoints e modelos resumidos de contratos. Faça um desenho de alto nivel da arquitetura, detalhando o fluxo de comunicação entre todos microservices. Complete detalhando soluções para os problemas encontrados, como banco de dados utilizado, autenticação utilizada, funcionamento do graphql vs rest, etc. O projeto será implementado em java spring, sinta-se livre para definir o resto.
 
 RESPOSTA Gemini:

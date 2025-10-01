@@ -1,13 +1,13 @@
-#3 - Setup projeto
+# 3 - Setup projeto
 
-PROMPT: 
-Perfeito, vamos fazer apenas algumas pequenas modificações. Primeiro, o projeto é um desafio da faculdade e não vai rodar na nuvem neste momento, apenas na maquina local de quem executar. Nesse contexto, faz sentido ter um API gateway? Se sim, como ele seria implementado?
-Segundo, faz sentido fazer todos os microservicos em um monorepo, separando em java module? Como ficaria a estrutura de pastas, considerando um projeto java spring com maven?
+## Prompt
+> Perfeito, vamos fazer apenas algumas pequenas modificações. Primeiro, o projeto é um desafio da faculdade e não vai rodar na nuvem neste momento, apenas na maquina local de quem executar. Nesse contexto, faz sentido ter um API gateway? Se sim, como ele seria implementado?
+> Segundo, faz sentido fazer todos os microservicos em um monorepo, separando em java module? Como ficaria a estrutura de pastas, considerando um projeto java spring com maven?
 
-Resposta Gemini:
+## Resposta
 Excelente! São duas perguntas muito pertinentes que abordam os aspectos práticos da implementação e do gerenciamento do projeto em um ambiente de desenvolvimento local. Vamos detalhar cada um dos pontos.
 
-### 1. O Papel do API Gateway em Desenvolvimento Local
+## 1. O Papel do API Gateway em Desenvolvimento Local
 
 **A resposta curta é: Sim, faz total sentido manter o API Gateway, mesmo para execução local.**
 
@@ -63,7 +63,7 @@ Neste cenário, todos os microserviços individuais (`service-auth`, `service-ag
 
 ---
 
-### 2. Monorepo com Módulos Java (Maven)
+## 2. Monorepo com Módulos Java (Maven)
 
 **Sim, para um projeto deste escopo, um monorepo com módulos Maven é a abordagem mais prática e recomendada.**
 
