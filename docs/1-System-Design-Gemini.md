@@ -1,12 +1,12 @@
 # 3 - Setup projeto
 
-PROMPT:
-Faça um system design completo a partir da descrição de trabalho anexada no pdf. Comece entendendo o problema e fazendo perguntas de clarificação quando necessario para estabelecer o escopo. Faça o design das APIs, especificando endpoints e modelos resumidos de contratos. Faça um desenho de alto nivel da arquitetura, detalhando o fluxo de comunicação entre todos microservices. Complete detalhando soluções para os problemas encontrados, como banco de dados utilizado, autenticação utilizada, funcionamento do graphql vs rest, etc. O projeto será implementado em java spring, sinta-se livre para definir o resto.
+## Prompt
+> Faça um system design completo a partir da descrição de trabalho anexada no pdf. Comece entendendo o problema e fazendo perguntas de clarificação quando necessario para estabelecer o escopo. Faça o design das APIs, especificando endpoints e modelos resumidos de contratos. Faça um desenho de alto nivel da arquitetura, detalhando o fluxo de comunicação entre todos microservices. Complete detalhando soluções para os problemas encontrados, como banco de dados utilizado, autenticação utilizada, funcionamento do graphql vs rest, etc. O projeto será implementado em java spring, sinta-se livre para definir o resto.
 
-RESPOSTA Gemini:
+## Resposta
 Apresento um design de sistema completo para a aplicação hospitalar.
 
-### 1. Entendimento do Problema e Escopo
+## 1. Entendimento do Problema e Escopo
 
 O objetivo é projetar o backend para um sistema de gerenciamento hospitalar. O sistema deve permitir o agendamento de consultas, o gerenciamento de históricos de pacientes e o envio de notificações de lembrete. A arquitetura deve ser baseada em microserviços, com foco em segurança, escalabilidade e comunicação assíncrona, utilizando Java e o ecossistema Spring.
 
@@ -15,7 +15,7 @@ O objetivo é projetar o backend para um sistema de gerenciamento hospitalar. O 
 *   **Enfermeiros:** Podem registrar novas consultas, modificar as existentes e acessar o histórico.
 *   **Pacientes:** Podem visualizar apenas suas próprias consultas.
 
-### 2. Perguntas de Clarificação e Suposições
+## 2. Perguntas de Clarificação e Suposições
 
 Para um projeto real, faríamos as seguintes perguntas para refinar o escopo. Para este exercício, farei algumas suposições.
 
@@ -31,7 +31,7 @@ Para um projeto real, faríamos as seguintes perguntas para refinar o escopo. Pa
 *   **Quais os requisitos de retenção de dados para o histórico do paciente?**
     *   **Suposição:** Os dados do histórico do paciente devem ser mantidos por um longo período por razões médicas e legais. A escolha do banco de dados deve considerar isso.
 
-### 3. Design da Arquitetura de Alto Nível
+## 3. Design da Arquitetura de Alto Nível
 
 A arquitetura será composta por múltiplos microserviços, cada um com uma responsabilidade única, comunicando-se de forma síncrona via APIs REST/GraphQL e de forma assíncrona através de um message broker (RabbitMQ). Um API Gateway servirá como ponto de entrada único para todas as requisições dos clientes.
 
@@ -42,14 +42,14 @@ A arquitetura será composta por múltiplos microserviços, cada um com uma resp
 4.  **Serviço de Histórico:** Armazena uma cópia dos dados de consulta para fins de histórico e expõe esses dados através de uma API GraphQL para consultas flexíveis.
 5.  **API Gateway:** Ponto de entrada único que roteia as requisições para os serviços apropriados. Também é responsável por validar os tokens JWT.
 
-### 4. Design das APIs
+## 4. Design das APIs
 
-#### Serviço de Autenticação (REST)
+### Serviço de Autenticação (REST)
 *   **`POST /auth/login`**: Autentica um usuário.
     *   **Request Body**: `{ "email": "user@example.com", "password": "password123" }`
     *   **Response Body**: `{ "token": "jwt.token.string" }`
 
-#### Serviço de Agendamento (REST)
+### Serviço de Agendamento (REST)
 *   **`POST /agendamentos`**: Cria uma nova consulta (acessível por Enfermeiros).
     *   **Request Body**: `{ "pacienteId": 123, "medicoId": 456, "dataHora": "2025-12-20T10:00:00Z", "motivo": "Check-up" }`
     *   **Response Body**: `{ "id": 1, "pacienteId": 123, "medicoId": 456, "dataHora": "2025-12-20T10:00:00Z", "status": "AGENDADO" }`
@@ -61,7 +61,7 @@ A arquitetura será composta por múltiplos microserviços, cada um com uma resp
 *   **`GET /agendamentos/paciente/{id}`**: Lista as consultas de um paciente (acessível por Pacientes para seu próprio ID, Médicos e Enfermeiros para qualquer ID).
     *   **Response Body**: `[ { "id": 1, ... }, { "id": 2, ... } ]`
 
-#### Serviço de Histórico (GraphQL)
+### Serviço de Histórico (GraphQL)
 *   **Endpoint**: `POST /historico/graphql`
 *   **Exemplo de Query**: Listar todos os atendimentos de um paciente.
     ```graphql
@@ -90,12 +90,12 @@ A arquitetura será composta por múltiplos microserviços, cada um com uma resp
 
 ### 5. Detalhamento das Soluções
 
-#### Escolha do Banco de Dados
+### Escolha do Banco de Dados
 *   **Serviço de Autenticação e Agendamento (PostgreSQL):** Utilizaremos um banco de dados relacional como o PostgreSQL. Os dados de usuários e agendamentos são estruturados e se beneficiam da consistência e das transações ACID (Atomicidade, Consistência, Isolamento e Durabilidade), que são cruciais para operações como agendar uma consulta.
 
 *   **Serviço de Histórico (MongoDB - Opcional):** Para o serviço de histórico, um banco de dados NoSQL como o MongoDB é uma ótima opção. Ele armazena dados em um formato semelhante a JSON, o que o torna muito flexível para armazenar "snapshots" das consultas. Se a estrutura de uma consulta mudar no futuro, o serviço de histórico pode lidar com diferentes versões dos dados sem problemas.
 
-#### Autenticação e Autorização com Spring Security e JWT
+### Autenticação e Autorização com Spring Security e JWT
 1.  **Fluxo de Autenticação:**
     *   O cliente envia credenciais (email/senha) para o `Serviço de Autenticação`.
     *   O serviço valida as credenciais e, se corretas, gera um JWT contendo o `userId` e as `roles` (ex: `ROLE_MEDICO`, `ROLE_PACIENTE`).
@@ -126,7 +126,7 @@ Este fluxo garante que os serviços sejam desacoplados e resilientes.
 5.  O **Serviço de Notificações** recebe a mensagem, processa-a (ex: agenda o envio de um lembrete 24 horas antes da consulta) e envia um e-mail de confirmação ao paciente.
 6.  O **Serviço de Histórico** recebe a mesma mensagem e salva uma cópia dos dados da consulta em seu banco de dados (MongoDB) para ser disponibilizada via GraphQL.
 
-#### GraphQL vs. REST
+### GraphQL vs. REST
 *   **REST** é utilizado no **Serviço de Agendamento** para operações de "comando" (criar, editar), que são ações diretas e bem definidas. Os endpoints são simples e seguem um padrão claro.
 *   **GraphQL** é utilizado no **Serviço de Histórico** porque ele brilha em cenários de "query" complexas. O frontend pode precisar de diferentes combinações de dados do histórico do paciente. Com GraphQL, o cliente pode solicitar exatamente os campos de que precisa em uma única requisição, evitando tanto a busca excessiva de dados (`over-fetching`) quanto a necessidade de fazer múltiplas chamadas (`under-fetching`).
 
