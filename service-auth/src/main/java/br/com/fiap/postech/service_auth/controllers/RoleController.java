@@ -4,6 +4,7 @@ import br.com.fiap.postech.service_auth.controllers.dto.RoleDTO;
 import br.com.fiap.postech.service_auth.entities.Role;
 import br.com.fiap.postech.service_auth.mapper.RoleMapper;
 import br.com.fiap.postech.service_auth.services.RoleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/role")
+@Tag(name = "Role", description = "Endpoints para gerenciar as roles de acesso")
 public class RoleController {
 
     private final RoleService roleService;

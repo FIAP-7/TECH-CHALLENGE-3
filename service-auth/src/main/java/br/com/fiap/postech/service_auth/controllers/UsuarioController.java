@@ -4,6 +4,7 @@ import br.com.fiap.postech.service_auth.controllers.dto.UsuarioDTO;
 import br.com.fiap.postech.service_auth.entities.Usuario;
 import br.com.fiap.postech.service_auth.mapper.UsuarioMapper;
 import br.com.fiap.postech.service_auth.services.UsuarioService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/usuario")
+@Tag(name = "Usuario", description = "Endpoints para gerenciar os Usuários")
 public class UsuarioController {
 
     @Autowired
