@@ -20,6 +20,13 @@ spring:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: 1234
+
+
 logging:
   level:
     org.hibernate.SQL: warn

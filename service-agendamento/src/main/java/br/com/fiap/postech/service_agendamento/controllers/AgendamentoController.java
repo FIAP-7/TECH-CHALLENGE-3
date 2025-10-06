@@ -1,9 +1,26 @@
 package br.com.fiap.postech.service_agendamento.controllers;
 
-import br.com.fiap.postech.service_agendamento.entities.Agendamento;
-import br.com.fiap.postech.service_agendamento.services.AgendamentoService;
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import br.com.fiap.postech.service_agendamento.controllers.dto.AgendamentoDTO;
+import br.com.fiap.postech.service_agendamento.entities.Agendamento;
 import br.com.fiap.postech.service_agendamento.mapper.AgendamentoMapper;
+import br.com.fiap.postech.service_agendamento.services.AgendamentoService;
+import br.com.fiap.postech.service_notificacoes.config.RabbitMQFanoutConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,12 +28,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/agendamentos")
@@ -24,9 +35,11 @@ import java.util.List;
 public class AgendamentoController {
 
     private final AgendamentoService service;
+    private final RabbitTemplate rabbitTemplate;
 
-    public AgendamentoController(AgendamentoService service) {
+    public AgendamentoController(AgendamentoService service, RabbitTemplate rabbitTemplate) {
         this.service = service;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @PostMapping
@@ -40,10 +53,24 @@ public class AgendamentoController {
                                                          @RequestBody AgendamentoDTO.CreateRequest request) {
         Agendamento novo = AgendamentoMapper.toEntity(request);
         Agendamento salvo = service.criar(novo);
-        // TODO: Publicar mensagem no RabbitMQ aqui
+        
+        String mensagem = "Novo agendamento criado: id - " + salvo.getId() + ", paciente - " + salvo.getPacienteId() + ", data - " + salvo.getDataHora();
+        
+        enviarMensagemParaNotificacaoEmail(mensagem);
+        
+        enviarMensagemParaHistorico(mensagem);
+        
         return ResponseEntity.created(URI.create("/agendamentos/" + salvo.getId()))
                 .body(AgendamentoMapper.toResponse(salvo));
     }
+
+	private void enviarMensagemParaHistorico(String mensagem) {
+		rabbitTemplate.convertAndSend(RabbitMQFanoutConfig.HISTORICO_QUEUE, mensagem);
+	}
+
+	private void enviarMensagemParaNotificacaoEmail(String mensagem) {
+		rabbitTemplate.convertAndSend(RabbitMQFanoutConfig.EMAIL_QUEUE, mensagem);
+	}
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar agendamento", description = "Atualiza campos do agendamento existente pelo ID.")
@@ -58,7 +85,13 @@ public class AgendamentoController {
                                                              @RequestBody AgendamentoDTO.UpdateRequest request) {
         Agendamento atualizacao = AgendamentoMapper.toEntity(request);
         Agendamento atualizado = service.atualizar(id, atualizacao);
-        // TODO: Publicar mensagem no RabbitMQ aqui
+        
+        String mensagem = "Agendamento alterado: id - " + atualizado.getId() + ", paciente - " + atualizado.getPacienteId() + ", data - " + atualizado.getDataHora();
+        
+        enviarMensagemParaNotificacaoEmail(mensagem);
+        
+        enviarMensagemParaHistorico(mensagem);
+        
         return ResponseEntity.ok(AgendamentoMapper.toResponse(atualizado));
     }
 
