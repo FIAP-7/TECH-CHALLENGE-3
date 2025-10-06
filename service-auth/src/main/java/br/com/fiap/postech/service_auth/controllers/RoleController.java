@@ -25,7 +25,7 @@ public class RoleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleDTO.Response> criar(@RequestBody RoleDTO.CreateRequest roleDTO) {
         Role novo = RoleMapper.toEntity(roleDTO);
 
@@ -35,7 +35,7 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleDTO.Response> atualizar(@PathVariable("id") Long id, @RequestBody RoleDTO.UpdateRequest roleDTO) {
         Role novo = RoleMapper.toEntity(roleDTO);
         Role atualizado = roleService.atualizar(id, novo);
@@ -43,7 +43,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleDTO.Response> buscar(@PathVariable("id") Long id) {
         Role role = roleService.buscarPorId(id);
 
@@ -51,7 +51,7 @@ public class RoleController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<RoleDTO.Response>> buscarTodos() {
         List<Role> roles = roleService.buscarTodos();
 
@@ -61,7 +61,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletar(@PathVariable("id") Long id) {
         roleService.deletar(id);
 

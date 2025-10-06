@@ -21,7 +21,7 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioDTO.Response> create(@RequestBody UsuarioDTO.CreateRequest usuarioRequest) {
         Usuario novo = UsuarioMapper.toEntity(usuarioRequest);
 
@@ -31,7 +31,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioDTO.Response> update(@PathVariable("id") Long id, @RequestBody UsuarioDTO.UpdateRequest usuarioRequest) {
         Usuario novo = UsuarioMapper.toEntity(usuarioRequest);
         var atualizado = usuarioService.atualizar(id, novo);
@@ -40,7 +40,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{username}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioDTO.Response> buscar(@PathVariable("username") String username) {
         Usuario user = usuarioService.findUsuarioByUsername(username);
 
@@ -48,7 +48,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/inativar/{id}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> inativar(@PathVariable("id") Long id) {
         usuarioService.inativarUser(id);
 

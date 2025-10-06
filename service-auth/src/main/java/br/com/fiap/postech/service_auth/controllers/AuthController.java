@@ -34,12 +34,13 @@ public class AuthController {
     @Operation(summary = "Login usuario")
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody AuthDTO dto) {
-        System.out.println(dto.toString());
         Optional<Usuario> user = usuarioService.login(dto.login(), dto.password());
+
         if (user.isPresent()) {
             String token = tokenService.generateToken(user.get());
             return ResponseEntity.ok(token);
         }
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
@@ -47,9 +48,11 @@ public class AuthController {
     @PostMapping("/validate")
     public ResponseEntity<TokenValidationResult> validate(@RequestBody String token) {
         TokenValidationResult result = tokenService.validateToken(token);
+
         if (result.isValid()) {
             return ResponseEntity.ok(result);
         }
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
     }
 }

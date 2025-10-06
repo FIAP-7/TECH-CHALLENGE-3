@@ -17,7 +17,7 @@ import java.util.Base64;
 @Service
 public class TokenService {
 
-    private static final String SECRET = "0123456789abcdef0123456789abcdef"; // 32 bytes -> 256 bit key
+    private static final String SECRET = "postech07fiap2025techchallenge03"; // 32 bytes -> 256 bit key
     private static final String ALGORITHM = "AES/GCM/NoPadding";
 
     private SecretKey getKey() {
