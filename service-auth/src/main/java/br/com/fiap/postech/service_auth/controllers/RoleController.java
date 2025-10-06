@@ -6,6 +6,7 @@ import br.com.fiap.postech.service_auth.mapper.RoleMapper;
 import br.com.fiap.postech.service_auth.services.RoleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -24,6 +25,7 @@ public class RoleController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
     public ResponseEntity<RoleDTO.Response> criar(@RequestBody RoleDTO.CreateRequest roleDTO) {
         Role novo = RoleMapper.toEntity(roleDTO);
 
@@ -33,6 +35,7 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
     public ResponseEntity<RoleDTO.Response> atualizar(@PathVariable("id") Long id, @RequestBody RoleDTO.UpdateRequest roleDTO) {
         Role novo = RoleMapper.toEntity(roleDTO);
         Role atualizado = roleService.atualizar(id, novo);
@@ -40,6 +43,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
     public ResponseEntity<RoleDTO.Response> buscar(@PathVariable("id") Long id) {
         Role role = roleService.buscarPorId(id);
 
@@ -47,6 +51,7 @@ public class RoleController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
     public ResponseEntity<List<RoleDTO.Response>> buscarTodos() {
         List<Role> roles = roleService.buscarTodos();
 
@@ -56,6 +61,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERO')")
     public ResponseEntity<Void> deletar(@PathVariable("id") Long id) {
         roleService.deletar(id);
 
