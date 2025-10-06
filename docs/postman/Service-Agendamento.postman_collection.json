@@ -1,0 +1,103 @@
+{
+  "info": {
+    "_postman_id": "c5d6e5a2-9b03-4b9c-8b9c-8b2a5d9c1f21",
+    "name": "Service Agendamento",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection para testar o CRUD do serviço de agendamentos"
+  },
+  "item": [
+    {
+      "name": "Criar agendamento",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/agendamentos",
+          "host": ["{{baseUrl}}"],
+          "path": ["agendamentos"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": 123,\n  \"medicoId\": 456,\n  \"dataHora\": \"2025-12-20T10:00:00Z\",\n  \"motivo\": \"Check-up anual\"\n}"
+        },
+        "description": "Cria um novo agendamento"
+      },
+      "response": []
+    },
+    {
+      "name": "Atualizar agendamento",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/agendamentos/{{id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["agendamentos", "{{id}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dataHora\": \"2025-12-21T11:00:00Z\",\n  \"status\": \"REMARCADO\",\n  \"motivo\": \"Mudança de horário\"\n}"
+        },
+        "description": "Atualiza um agendamento existente"
+      },
+      "response": []
+    },
+    {
+      "name": "Buscar por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/agendamentos/{{id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["agendamentos", "{{id}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Listar por paciente",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/agendamentos/paciente/{{pacienteId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["agendamentos", "paciente", "{{pacienteId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Remover agendamento",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/agendamentos/{{id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["agendamentos", "{{id}}"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "id",
+      "value": "1"
+    },
+    {
+      "key": "pacienteId",
+      "value": "123"
+    }
+  ]
+}
