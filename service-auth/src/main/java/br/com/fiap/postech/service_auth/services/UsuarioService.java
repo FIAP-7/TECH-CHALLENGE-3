@@ -89,6 +89,10 @@ public class UsuarioService {
         Optional<Usuario> usuario = usuarioRepository.findUsuarioByUsername(username);
 
         if(usuario.isPresent()){
+            if (!usuario.get().isActive()) {
+                return Optional.empty();
+            }
+
             if(passwordEncoder.matches(password, usuario.get().getPassword())){
                 return usuario;
             }
