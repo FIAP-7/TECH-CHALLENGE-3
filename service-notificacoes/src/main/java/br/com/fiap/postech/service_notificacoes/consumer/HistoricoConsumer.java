@@ -7,13 +7,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import br.com.fiap.postech.service_notificacoes.config.RabbitMQFanoutConfig;
 import br.com.fiap.postech.service_notificacoes.dto.NotificationDTO;
 
+public class HistoricoConsumer {
+	private final Logger log = LoggerFactory.getLogger(EmailConsumer.class);
 
-public class EmailConsumer {
-
-    private final Logger log = LoggerFactory.getLogger(EmailConsumer.class);
-
-    @RabbitListener(queues = RabbitMQFanoutConfig.EMAIL_QUEUE)
-    public void receiveEmailNotification(NotificationDTO message) {
+    @RabbitListener(queues = RabbitMQFanoutConfig.HISTORICO_QUEUE)
+    public void receiveHistoricoNotification(NotificationDTO message) {
         log.info("Notificação recebida: {}", message);
     }
 }

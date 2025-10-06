@@ -54,14 +54,23 @@ public class AgendamentoController {
         Agendamento novo = AgendamentoMapper.toEntity(request);
         Agendamento salvo = service.criar(novo);
         
-        rabbitTemplate.convertAndSend(
-                RabbitMQFanoutConfig.EMAIL_QUEUE,
-                "Novo agendamento criado: id - " + salvo.getId() + ", paciente - " + salvo.getPacienteId() + ", data - " + salvo.getDataHora()
-        );
+        String mensagem = "Novo agendamento criado: id - " + salvo.getId() + ", paciente - " + salvo.getPacienteId() + ", data - " + salvo.getDataHora();
+        
+        enviarMensagemParaNotificacaoEmail(mensagem);
+        
+        enviarMensagemParaHistorico(mensagem);
         
         return ResponseEntity.created(URI.create("/agendamentos/" + salvo.getId()))
                 .body(AgendamentoMapper.toResponse(salvo));
     }
+
+	private void enviarMensagemParaHistorico(String mensagem) {
+		rabbitTemplate.convertAndSend(RabbitMQFanoutConfig.HISTORICO_QUEUE, mensagem);
+	}
+
+	private void enviarMensagemParaNotificacaoEmail(String mensagem) {
+		rabbitTemplate.convertAndSend(RabbitMQFanoutConfig.EMAIL_QUEUE, mensagem);
+	}
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar agendamento", description = "Atualiza campos do agendamento existente pelo ID.")
@@ -77,10 +86,11 @@ public class AgendamentoController {
         Agendamento atualizacao = AgendamentoMapper.toEntity(request);
         Agendamento atualizado = service.atualizar(id, atualizacao);
         
-        rabbitTemplate.convertAndSend(
-                RabbitMQFanoutConfig.EMAIL_QUEUE,
-                "Agendamento alterado: id - " + atualizado.getId() + ", paciente - " + atualizado.getPacienteId() + ", data - " + atualizado.getDataHora()
-        );
+        String mensagem = "Agendamento alterado: id - " + atualizado.getId() + ", paciente - " + atualizado.getPacienteId() + ", data - " + atualizado.getDataHora();
+        
+        enviarMensagemParaNotificacaoEmail(mensagem);
+        
+        enviarMensagemParaHistorico(mensagem);
         
         return ResponseEntity.ok(AgendamentoMapper.toResponse(atualizado));
     }
