@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiap.postech.service_agendamento.controllers.dto.AgendamentoCompletoDTO;
 import br.com.fiap.postech.service_agendamento.controllers.dto.AgendamentoDTO;
+import br.com.fiap.postech.service_agendamento.controllers.dto.AgendamentoDTO.Response;
+import br.com.fiap.postech.service_agendamento.controllers.dto.PessoaDTO;
 import br.com.fiap.postech.service_agendamento.entities.Agendamento;
 import br.com.fiap.postech.service_agendamento.mapper.AgendamentoMapper;
 import br.com.fiap.postech.service_agendamento.services.AgendamentoService;
@@ -54,23 +57,22 @@ public class AgendamentoController {
         Agendamento novo = AgendamentoMapper.toEntity(request);
         Agendamento salvo = service.criar(novo);
         
-        String mensagem = "Novo agendamento criado: id - " + salvo.getId() + ", paciente - " + salvo.getPacienteId() + ", data - " + salvo.getDataHora();
-        
-        enviarMensagemParaNotificacaoEmail(mensagem);
-        
-        enviarMensagemParaHistorico(mensagem);
+        publicarMensagem(AgendamentoMapper.toResponse(salvo));
         
         return ResponseEntity.created(URI.create("/agendamentos/" + salvo.getId()))
                 .body(AgendamentoMapper.toResponse(salvo));
     }
 
-	private void enviarMensagemParaHistorico(String mensagem) {
-		rabbitTemplate.convertAndSend(RabbitMQFanoutConfig.HISTORICO_QUEUE, mensagem);
-	}
+    private void publicarMensagem(Response agendamento) {
+        PessoaDTO paciente = new PessoaDTO(1L, "Nome Paciente", "teste@teste.com");
+        PessoaDTO medico = new PessoaDTO(2L, "Nome Medico", "medico@email.com");
+        AgendamentoCompletoDTO dto = new AgendamentoCompletoDTO(agendamento.id(), paciente, medico, agendamento.dataHora(), agendamento.motivo(),  agendamento.status().toString());
 
-	private void enviarMensagemParaNotificacaoEmail(String mensagem) {
-		rabbitTemplate.convertAndSend(RabbitMQFanoutConfig.EMAIL_QUEUE, mensagem);
-	}
+        rabbitTemplate.convertAndSend(
+                        RabbitMQFanoutConfig.EXCHANGE_NAME,
+                        "",
+                        dto);
+    }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar agendamento", description = "Atualiza campos do agendamento existente pelo ID.")
@@ -86,11 +88,7 @@ public class AgendamentoController {
         Agendamento atualizacao = AgendamentoMapper.toEntity(request);
         Agendamento atualizado = service.atualizar(id, atualizacao);
         
-        String mensagem = "Agendamento alterado: id - " + atualizado.getId() + ", paciente - " + atualizado.getPacienteId() + ", data - " + atualizado.getDataHora();
-        
-        enviarMensagemParaNotificacaoEmail(mensagem);
-        
-        enviarMensagemParaHistorico(mensagem);
+        publicarMensagem(AgendamentoMapper.toResponse(atualizado));
         
         return ResponseEntity.ok(AgendamentoMapper.toResponse(atualizado));
     }

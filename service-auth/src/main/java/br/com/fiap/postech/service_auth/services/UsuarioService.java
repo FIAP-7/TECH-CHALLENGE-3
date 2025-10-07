@@ -53,6 +53,8 @@ public class UsuarioService {
         }
 
         if(usuario.getRole() != null) existente.setRole(usuario.getRole());
+        if(usuario.getEmail() != null) existente.setEmail(usuario.getEmail());
+        if(usuario.getName() != null) existente.setName(usuario.getName());
 
         existente.setActive(usuario.isActive());
 

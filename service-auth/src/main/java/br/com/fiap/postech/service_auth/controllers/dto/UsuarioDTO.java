@@ -5,6 +5,8 @@ public class UsuarioDTO {
     public record CreateRequest(
             String username,
             String password,
+            String name,
+            String email,
             RoleDTO.roleDTO role
     ) {}
 
@@ -12,6 +14,8 @@ public class UsuarioDTO {
             Long id,
             String username,
             String password,
+            String name,
+            String email,           
             Boolean active,
             RoleDTO.roleDTO role
     ) {}

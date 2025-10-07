@@ -1,0 +1,19 @@
+type Pessoa {
+	id: ID
+	nome: String
+	email: String
+}
+
+type AgendamentoCompleto {
+	id: ID
+	paciente: Pessoa
+	medico: Pessoa
+	dataHora: String
+	motivo: String
+	status: String
+}
+
+type Query {
+	agendamentos: [AgendamentoCompleto]
+	agendamentoById(id: ID!): AgendamentoCompleto
+}
