@@ -66,7 +66,12 @@ public class AgendamentoController {
     private void publicarMensagem(Response agendamento) {
         PessoaDTO paciente = new PessoaDTO(1L, "Nome Paciente", "teste@teste.com");
         PessoaDTO medico = new PessoaDTO(2L, "Nome Medico", "medico@email.com");
-        AgendamentoCompletoDTO dto = new AgendamentoCompletoDTO(agendamento.id(), paciente, medico, agendamento.dataHora(), agendamento.motivo(),  agendamento.status().toString());
+        AgendamentoCompletoDTO dto = new AgendamentoCompletoDTO(agendamento.id(), 
+	        paciente, 
+	        medico, 
+	        agendamento.dataHora().toString(), 
+	        agendamento.motivo(),  
+	        agendamento.status().toString());
 
         rabbitTemplate.convertAndSend(
                         RabbitMQFanoutConfig.EXCHANGE_NAME,
