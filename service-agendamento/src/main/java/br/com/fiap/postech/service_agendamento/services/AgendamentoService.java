@@ -1,42 +1,26 @@
 package br.com.fiap.postech.service_agendamento.services;
 
-import br.com.fiap.postech.service_agendamento.dto.AgendamentoEventDTO;
 import br.com.fiap.postech.service_agendamento.entities.Agendamento;
 import br.com.fiap.postech.service_agendamento.exceptions.RecursoNaoEncontradoException;
 import br.com.fiap.postech.service_agendamento.repositories.AgendamentoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class AgendamentoService {
 
     private final AgendamentoRepository repository;
-    private final AgendamentoPublisherService publisherService;
 
-    public AgendamentoService(AgendamentoRepository repository, AgendamentoPublisherService publisherService) {
+    public AgendamentoService(AgendamentoRepository repository) {
         this.repository = repository;
-        this.publisherService = publisherService;
     }
 
     @Transactional
     public Agendamento criar(Agendamento agendamento) {
         agendamento.setId(null);
-        Agendamento salvo = repository.save(agendamento);
-
-        LocalDateTime dataHoraSemOffset = salvo.getDataHora().toLocalDateTime();
-
-        AgendamentoEventDTO event = new AgendamentoEventDTO(
-                salvo.getId(),
-                salvo.getPacienteId(),
-                dataHoraSemOffset,
-                "CRIACAO"
-        );
-        publisherService.publishAgendamentoEvent(event);
-
-        return salvo;
+        return repository.save(agendamento);
     }
 
     @Transactional
@@ -47,19 +31,7 @@ public class AgendamentoService {
         if (atualizacao.getMotivo() != null) existente.setMotivo(atualizacao.getMotivo());
         if (atualizacao.getPacienteId() != null) existente.setPacienteId(atualizacao.getPacienteId());
         if (atualizacao.getMedicoId() != null) existente.setMedicoId(atualizacao.getMedicoId());
-        Agendamento atualizado = repository.save(existente);
-
-        LocalDateTime dataHoraSemOffset = atualizado.getDataHora().toLocalDateTime();
-
-        AgendamentoEventDTO event = new AgendamentoEventDTO(
-                atualizado.getId(),
-                atualizado.getPacienteId(),
-                dataHoraSemOffset,
-                "ATUALIZACAO"
-        );
-        publisherService.publishAgendamentoEvent(event);
-
-        return atualizado;
+        return repository.save(existente);
     }
 
     @Transactional(readOnly = true)
@@ -80,13 +52,5 @@ public class AgendamentoService {
             throw new RecursoNaoEncontradoException("Agendamento não encontrado: " + id);
         }
         repository.deleteById(id);
-
-        AgendamentoEventDTO event = new AgendamentoEventDTO(
-                id,
-                null,
-                null,
-                "CANCELAMENTO"
-        );
-        publisherService.publishAgendamentoEvent(event);
     }
 }
