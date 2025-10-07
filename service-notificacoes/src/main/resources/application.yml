@@ -1,32 +1,8 @@
 server:
   port: 9090
-
 spring:
-  application:
-    name: service-notificacoes
   rabbitmq:
     host: localhost
     port: 5672
     username: user
     password: 1234
-
-  datasource:
-    url: jdbc:postgresql://postgres:5432/gestao_hospitalar
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-    open-in-view: false
-  task:
-    scheduling:
-      enabled: true
-
-logging:
-  level:
-    org.hibernate.SQL: warn
-    org.hibernate.orm.jdbc.bind: warn
