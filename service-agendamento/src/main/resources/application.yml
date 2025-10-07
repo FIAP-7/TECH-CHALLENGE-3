@@ -1,0 +1,33 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: service-agendamento
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gestao_hospitalar
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: 1234
+
+
+logging:
+  level:
+    org.hibernate.SQL: warn
+    org.hibernate.orm.jdbc.bind: warn
