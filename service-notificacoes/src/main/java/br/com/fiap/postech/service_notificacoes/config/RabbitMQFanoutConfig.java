@@ -18,6 +18,7 @@ public class RabbitMQFanoutConfig {
 	public static final String ROUTING_KEY = "notificationKey";
     public static final String EMAIL_QUEUE = "email_queue";
     public static final String HISTORICO_QUEUE = "historico_queue";
+    public static final String LEMBRETE_QUEUE = "lembrete_queue";
 
     @Bean
     public FanoutExchange fanoutExchange() {
@@ -35,6 +36,11 @@ public class RabbitMQFanoutConfig {
 	}
 
     @Bean
+    public Queue lembreteQueue() {
+        return new Queue(LEMBRETE_QUEUE, true);
+    }
+
+    @Bean
     public Binding emailBinding(@Qualifier("emailQueue") Queue emailQueue, FanoutExchange fanoutExchange) {
         return BindingBuilder.bind(emailQueue).to(fanoutExchange);
     }
@@ -42,6 +48,11 @@ public class RabbitMQFanoutConfig {
     @Bean
     public Binding historicoBinding(@Qualifier("historicoQueue") Queue historicoQueue, FanoutExchange fanoutExchange) {
     	return BindingBuilder.bind(historicoQueue).to(fanoutExchange);
+    }
+
+    @Bean
+    public Binding lembreteBinding(@Qualifier("lembreteQueue") Queue lembreteQueue, FanoutExchange fanoutExchange) {
+        return BindingBuilder.bind(lembreteQueue).to(fanoutExchange);
     }
 
     @Bean
