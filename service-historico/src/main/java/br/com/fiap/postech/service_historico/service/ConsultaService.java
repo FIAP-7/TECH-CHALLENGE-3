@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConsultaService {
@@ -34,5 +35,9 @@ public class ConsultaService {
 
     public List<AgendamentoDocument> findByPacienteIdAndDataHoraBefore(Long pacienteId, OffsetDateTime now) {
         return repository.findByPacienteIdAndDataHoraBefore(pacienteId, OffsetDateTime.now());
+    }
+
+    public AgendamentoDocument findById(Long id) {
+        return repository.findById(id).orElse(null);
     }
 }

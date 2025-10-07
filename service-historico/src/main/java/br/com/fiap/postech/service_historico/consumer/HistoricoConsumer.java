@@ -1,5 +1,7 @@
 package br.com.fiap.postech.service_historico.consumer;
 
+import java.time.OffsetDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -39,7 +41,7 @@ public class HistoricoConsumer {
                 dto.id(),
                 paciente,
                 medico,
-                dto.dataHora(),
+                OffsetDateTime.parse(dto.dataHora()),
                 dto.motivo(),
                 dto.status());
     }
