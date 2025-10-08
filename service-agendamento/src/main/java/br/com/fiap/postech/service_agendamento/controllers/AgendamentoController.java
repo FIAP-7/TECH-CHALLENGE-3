@@ -143,18 +143,4 @@ public class AgendamentoController {
                 .stream().map(AgendamentoMapper::toResponse).toList();
         return ResponseEntity.ok(lista);
     }
-
-    // TODO: Método adicionado somente para auxiliar no desenvolvimento, remover antes da entrega final
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Remover agendamento", description = "Remove um agendamento existente pelo ID.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Agendamento removido", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content)
-    })
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
-    public void remover(@Parameter(description = "ID do agendamento a ser removido")
-                        @PathVariable("id") Long id) {
-        service.remover(id);
-    }
 }
