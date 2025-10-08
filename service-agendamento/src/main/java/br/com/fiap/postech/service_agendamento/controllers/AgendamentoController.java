@@ -3,6 +3,7 @@ package br.com.fiap.postech.service_agendamento.controllers;
 import java.net.URI;
 import java.util.List;
 
+import br.com.fiap.postech.service_agendamento.services.UsuarioClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,10 +41,12 @@ public class AgendamentoController {
 
     private final AgendamentoService service;
     private final RabbitTemplate rabbitTemplate;
+    private final UsuarioClient usuarioClient;
 
-    public AgendamentoController(AgendamentoService service, RabbitTemplate rabbitTemplate) {
+    public AgendamentoController(AgendamentoService service, RabbitTemplate rabbitTemplate, UsuarioClient usuarioClient) {
         this.service = service;
         this.rabbitTemplate = rabbitTemplate;
+        this.usuarioClient = usuarioClient;
     }
 
     @PostMapping
@@ -58,22 +61,34 @@ public class AgendamentoController {
                                                          @RequestBody AgendamentoDTO.CreateRequest request) {
         Agendamento novo = AgendamentoMapper.toEntity(request);
         Agendamento salvo = service.criar(novo);
-        
+
         publicarMensagem(AgendamentoMapper.toResponse(salvo));
-        
+
         return ResponseEntity.created(URI.create("/agendamentos/" + salvo.getId()))
                 .body(AgendamentoMapper.toResponse(salvo));
     }
 
     private void publicarMensagem(Response agendamento) {
-        PessoaDTO paciente = new PessoaDTO(1L, "Nome Paciente", "teste@teste.com");
-        PessoaDTO medico = new PessoaDTO(2L, "Nome Medico", "medico@email.com");
-        AgendamentoCompletoDTO dto = new AgendamentoCompletoDTO(agendamento.id(), 
-	        paciente, 
-	        medico, 
-	        agendamento.dataHora().toString(), 
-	        agendamento.motivo(),  
-	        agendamento.status().toString());
+        var pacienteResp = usuarioClient.buscarPorId(agendamento.pacienteId());
+        var medicoResp = usuarioClient.buscarPorId(agendamento.medicoId());
+
+        PessoaDTO paciente = new PessoaDTO(
+                pacienteResp != null ? pacienteResp.id() : agendamento.pacienteId(),
+                pacienteResp != null ? pacienteResp.name() : null,
+                pacienteResp != null ? pacienteResp.email() : null
+        );
+        PessoaDTO medico = new PessoaDTO(
+                medicoResp != null ? medicoResp.id() : agendamento.medicoId(),
+                medicoResp != null ? medicoResp.name() : null,
+                medicoResp != null ? medicoResp.email() : null
+        );
+
+        AgendamentoCompletoDTO dto = new AgendamentoCompletoDTO(agendamento.id(),
+                paciente,
+                medico,
+                agendamento.dataHora() != null ? agendamento.dataHora().toString() : null,
+                agendamento.motivo(),
+                agendamento.status() != null ? agendamento.status().toString() : null);
 
         rabbitTemplate.convertAndSend(
                         RabbitMQProducerConfig.EXCHANGE_NAME,
@@ -95,9 +110,9 @@ public class AgendamentoController {
                                                              @RequestBody AgendamentoDTO.UpdateRequest request) {
         Agendamento atualizacao = AgendamentoMapper.toEntity(request);
         Agendamento atualizado = service.atualizar(id, atualizacao);
-        
+
         publicarMensagem(AgendamentoMapper.toResponse(atualizado));
-        
+
         return ResponseEntity.ok(AgendamentoMapper.toResponse(atualizado));
     }
 

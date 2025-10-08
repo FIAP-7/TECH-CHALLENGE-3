@@ -47,6 +47,12 @@ public class UsuarioController {
         return ResponseEntity.ok().body(UsuarioMapper.toResponse(user));
     }
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UsuarioDTO.Response> buscarPorId(@PathVariable("id") Long id) {
+        Usuario user = usuarioService.findById(id);
+        return ResponseEntity.ok().body(UsuarioMapper.toResponse(user));
+    }
+
     @PostMapping("/inativar/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> inativar(@PathVariable("id") Long id) {
