@@ -65,6 +65,10 @@ public class UsuarioService {
         return usuarioRepository.findUsuarioByUsername(username).orElse(null);
     }
 
+    public Usuario findById(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNaoExistenteException(id));
+    }
+
     public void inativarUser(Long id){
         var user = usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNaoExistenteException(id));
 

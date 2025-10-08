@@ -15,7 +15,7 @@ public class UsuarioDTO {
             String username,
             String password,
             String name,
-            String email,           
+            String email,
             Boolean active,
             RoleDTO.roleDTO role
     ) {}
@@ -23,6 +23,8 @@ public class UsuarioDTO {
     public record Response(
             Long id,
             String username,
+            String name,
+            String email,
             Boolean active,
             RoleDTO.Response role
     ){}
