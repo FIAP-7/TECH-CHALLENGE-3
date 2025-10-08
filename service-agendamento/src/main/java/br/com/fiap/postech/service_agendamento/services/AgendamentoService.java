@@ -72,21 +72,4 @@ public class AgendamentoService {
     public List<Agendamento> listarPorPaciente(Long pacienteId) {
         return repository.findByPacienteId(pacienteId);
     }
-
-    // TODO: Método somente para auxiliar no desenvolvimento, remover antes da entrega
-    @Transactional
-    public void remover(Long id) {
-        if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Agendamento não encontrado: " + id);
-        }
-        repository.deleteById(id);
-
-        AgendamentoEventDTO event = new AgendamentoEventDTO(
-                id,
-                null,
-                null,
-                "CANCELAMENTO"
-        );
-        publisherService.publishAgendamentoEvent(event);
-    }
 }
