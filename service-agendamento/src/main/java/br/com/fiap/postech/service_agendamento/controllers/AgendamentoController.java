@@ -43,7 +43,7 @@ public class AgendamentoController {
     private final RabbitTemplate rabbitTemplate;
     private final UsuarioClient usuarioClient;
 
-    public AgendamentoController(AgendamentoService service, RabbitTemplate rabbitTemplate, br.com.fiap.postech.service_agendamento.services.UsuarioClient usuarioClient) {
+    public AgendamentoController(AgendamentoService service, RabbitTemplate rabbitTemplate, UsuarioClient usuarioClient) {
         this.service = service;
         this.rabbitTemplate = rabbitTemplate;
         this.usuarioClient = usuarioClient;
