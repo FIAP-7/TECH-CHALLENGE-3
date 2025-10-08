@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiap.postech.service_agendamento.config.RabbitMQProducerConfig;
 import br.com.fiap.postech.service_agendamento.controllers.dto.AgendamentoCompletoDTO;
 import br.com.fiap.postech.service_agendamento.controllers.dto.AgendamentoDTO;
 import br.com.fiap.postech.service_agendamento.controllers.dto.AgendamentoDTO.Response;
@@ -24,7 +25,6 @@ import br.com.fiap.postech.service_agendamento.controllers.dto.PessoaDTO;
 import br.com.fiap.postech.service_agendamento.entities.Agendamento;
 import br.com.fiap.postech.service_agendamento.mapper.AgendamentoMapper;
 import br.com.fiap.postech.service_agendamento.services.AgendamentoService;
-import br.com.fiap.postech.service_notificacoes.config.RabbitMQFanoutConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -76,7 +76,7 @@ public class AgendamentoController {
 	        agendamento.status().toString());
 
         rabbitTemplate.convertAndSend(
-                        RabbitMQFanoutConfig.EXCHANGE_NAME,
+                        RabbitMQProducerConfig.EXCHANGE_NAME,
                         "",
                         dto);
     }

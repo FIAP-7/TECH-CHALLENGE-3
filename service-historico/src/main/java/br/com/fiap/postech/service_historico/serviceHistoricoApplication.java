@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class serviceHistoricoApplication {
+public class ServiceHistoricoApplication {
     public static void main(String[] args) {
-        SpringApplication.run(serviceHistoricoApplication.class, args);
+        SpringApplication.run(ServiceHistoricoApplication.class, args);
     }
 }

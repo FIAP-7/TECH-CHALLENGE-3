@@ -14,12 +14,12 @@ RUN mvn dependency:go-offline
 
 COPY . .
 
-RUN mvn clean package -DskipTests -pl service-agendamento -am spring-boot:repackage
+RUN mvn clean package -DskipTests -pl service-notificacoes -am spring-boot:repackage
 
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
-COPY --from=builder /app/service-agendamento/target/service-agendamento-1.0.0-SNAPSHOT.jar app.jar
+COPY --from=builder /app/service-notificacoes/target/service-notificacoes-1.0.0-SNAPSHOT.jar app.jar
 
-EXPOSE 8082
+EXPOSE 8084
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,6 +1,5 @@
 version: '3.9'
 
-
 services:
   postgres:
     image: postgres:16
@@ -31,7 +30,89 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     restart: always
+  mongo:
+    image: mongo:6.0
+    container_name: mongo_historico
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  service-notificacoes:
+    build:
+      context: .  # O contexto é a raiz do projeto, onde está o pom.xml pai
+      dockerfile: service-notificacoes/Dockerfile # Aponta para o Dockerfile dentro da pasta do módulo
+    container_name: service-notificacoes
+    depends_on:
+      - rabbitmq
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: 1234
+    ports:
+      - "8084:8084"
+
+  service-historico:
+    build:
+      context: .  # O contexto é a raiz do projeto, onde está o pom.xml pai
+      dockerfile: service-historico/Dockerfile # Aponta para o Dockerfile dentro da pasta do módulo
+    container_name: service-historico
+    depends_on:
+      - mongo
+      - rabbitmq
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongo
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: historico_db
+      SPRING_DATA_MONGODB_USERNAME: root
+      SPRING_DATA_MONGODB_PASSWORD: root
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: 1234
+    ports:
+      - "8083:8083"
+  service-agendamento:
+    build:
+      context: .  # O contexto é a raiz do projeto, onde está o pom.xml pai
+      dockerfile: service-agendamento/Dockerfile # Aponta para o Dockerfile dentro da pasta do módulo
+    container_name: service-agendamento
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gestao_hospitalar
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: 1234
+    ports:
+      - "8082:8082"
+
+  service-auth:
+    build: 
+      context: .  # O contexto é a raiz do projeto, onde está o pom.xml pai
+      dockerfile: service-auth/Dockerfile # Aponta para o Dockerfile dentro da pasta do módulo
+    container_name: service-auth
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gestao_hospitalar
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8081:8081"
+
 
 volumes:
   pgdata_tc3: {}
   rabbitmq_data: {}
+  mongo_data: {}
