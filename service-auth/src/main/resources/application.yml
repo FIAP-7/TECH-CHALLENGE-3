@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8081
 
 spring:
   application:
@@ -27,3 +27,6 @@ logging:
   level:
     org.hibernate.SQL: warn
     org.hibernate.orm.jdbc.bind: warn
+
+jwt:
+  secret: h3lM6xmv8z1RgKscgY8eW3M2CUH9o5e1l1n8o6DqVq4=

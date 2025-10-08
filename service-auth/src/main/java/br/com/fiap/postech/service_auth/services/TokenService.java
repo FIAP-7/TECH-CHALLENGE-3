@@ -1,101 +1,71 @@
 package br.com.fiap.postech.service_auth.services;
 
 import br.com.fiap.postech.service_auth.entities.Usuario;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
-import java.util.Base64;
+import java.security.Key;
+import java.util.*;
 
 @Service
 public class TokenService {
 
-    private static final String SECRET = "postech07fiap2025techchallenge03"; // 32 bytes -> 256 bit key
-    private static final String ALGORITHM = "AES/GCM/NoPadding";
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    private SecretKey getKey() {
-        return new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "AES");
+    public String generateToken(Usuario usuario) {
+
+        List<String> roles = new ArrayList<>();
+        roles.add("ROLE_" + usuario.getRole().getName());
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", roles);
+
+        return Jwts.builder()
+                .claims(claims)
+                .subject(usuario.getUsername())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15 min
+                .signWith(getSigningKey())
+                .compact();
     }
 
-    public String generateToken(Usuario user) {
-        String payload = (user.getRole() != null ? user.getRole().getName() : "-") + ":" + LocalDateTime.now();
-        byte[] iv = new byte[12];
-        new SecureRandom().nextBytes(iv);
-        try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, getKey(), new GCMParameterSpec(128, iv));
-            byte[] encrypted = cipher.doFinal(payload.getBytes(StandardCharsets.UTF_8));
-            ByteBuffer buffer = ByteBuffer.allocate(iv.length + encrypted.length);
-            buffer.put(iv);
-            buffer.put(encrypted);
-            return Base64.getEncoder().encodeToString(buffer.array());
-        } catch (Exception e) {
-            throw new RuntimeException("Could not generate token", e);
-        }
+    public Date extractExpiration(String token) {
+        return getParser().parseSignedClaims(token).getPayload().getExpiration();
     }
 
-    public TokenValidationResult validateToken(String token) {
-        if (token == null) {
-            return new TokenValidationResult(false, null, null);
-        }
-        try {
-            byte[] decoded = Base64.getDecoder().decode(token);
-            if (decoded.length < 12) {
-                return new TokenValidationResult(false, null, null);
-            }
-            ByteBuffer buffer = ByteBuffer.wrap(decoded);
-            byte[] iv = new byte[12];
-            buffer.get(iv);
-            byte[] cipherText = new byte[buffer.remaining()];
-            buffer.get(cipherText);
-
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, getKey(), new GCMParameterSpec(128, iv));
-            byte[] decrypted = cipher.doFinal(cipherText);
-            String payload = new String(decrypted, StandardCharsets.UTF_8);
-            String[] parts = payload.split(":", 2);
-            if (parts.length != 2) {
-                return new TokenValidationResult(false, null, null);
-            }
-            LocalDateTime date = LocalDateTime.parse(parts[1]);
-            return new TokenValidationResult(true, parts[0], date);
-        } catch (DateTimeParseException ex) {
-            return new TokenValidationResult(false, null, null);
-        } catch (Exception ex) {
-            return new TokenValidationResult(false, null, null);
-        }
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static class TokenValidationResult {
-        private final boolean valid;
-        private final String perfil;
-        private final LocalDateTime date;
-
-        public TokenValidationResult(boolean valid, String perfil, LocalDateTime date) {
-            this.valid = valid;
-            this.perfil = perfil;
-            this.date = date;
-        }
-
-        public boolean isValid() {
-            return valid;
-        }
-
-        public String getPerfil() {
-            return perfil;
-        }
-
-        public LocalDateTime getDate() {
-            return date;
-        }
+    private JwtParser getParser() {
+        return Jwts.parser()
+                .verifyWith((SecretKey) getSigningKey())
+                .build();
     }
 
+    public String extractUsername(String token) {
+        return getParser()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
 
+    public boolean isTokenValid(String token, String username) {
+        String extractedUsername = extractUsername(token);
+        return (extractedUsername.equals(username)) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return getParser()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration()
+                .before(new java.util.Date());
+    }
 }

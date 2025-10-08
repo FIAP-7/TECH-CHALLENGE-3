@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "14c28ae8-1a31-4c00-8bc8-90d5594e3acf",
-		"name": "Tech-Challenge 3 - Usuario",
+		"name": "Service-Auth",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "44932961"
 	},
@@ -85,7 +85,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Medico\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Medico2\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -123,7 +123,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Medico2\"\r\n}",
+							"raw": "{\r\n    \"id\": 4,\r\n    \"name\": \"paciente2\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -131,7 +131,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8083/role/1",
+							"raw": "http://localhost:8083/role/4",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -139,7 +139,7 @@
 							"port": "8083",
 							"path": [
 								"role",
-								"1"
+								"4"
 							]
 						}
 					},
@@ -161,7 +161,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8083/role/1",
+							"raw": "http://localhost:8083/role/5",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -169,7 +169,7 @@
 							"port": "8083",
 							"path": [
 								"role",
-								"1"
+								"5"
 							]
 						}
 					},
@@ -196,7 +196,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8083/usuario/usuario.medico",
+							"raw": "http://localhost:8083/usuario/usuario.medico-novo",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -204,7 +204,7 @@
 							"port": "8083",
 							"path": [
 								"usuario",
-								"usuario.medico"
+								"usuario.medico-novo"
 							]
 						}
 					},
@@ -227,7 +227,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"usuario.medico\",\r\n    \"password\": \"1234567as\",\r\n    \"role\": {\r\n        \"id\": 1\r\n    }\r\n}",
+							"raw": "{\r\n    \"username\": \"usuario.medico\",\r\n    \"password\": \"1234567as\",\r\n    \"role\": {\r\n        \"id\": 2\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -265,7 +265,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": 1,\r\n    \"username\": \"usuario.medico-novo\",\r\n    \"password\": \"1234567as\",\r\n    \"active\": true,\r\n    \"role\": {\r\n        \"id\": 1\r\n    }\r\n}",
+							"raw": "{\r\n    \"id\": 2,\r\n    \"username\": \"usuario.medico-novo\",\r\n    \"password\": \"1234567as\",\r\n    \"active\": true,\r\n    \"role\": {\r\n        \"id\": 2\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -312,7 +312,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8083/usuario/inativar/1",
+							"raw": "http://localhost:8083/usuario/inativar/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -321,7 +321,7 @@
 							"path": [
 								"usuario",
 								"inativar",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -333,7 +333,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Login",
+					"name": "Login Admin",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -362,16 +362,48 @@
 					"response": []
 				},
 				{
-					"name": "Validate Token",
+					"name": "Login Medico",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "sK1f/oc+UuCJMddtHjcYh8S9sY8JBzAke5Fw884j0JKnG/8q5CE9zVEON6qdzUw71AofsIkOCORwKp+qH0fT",
+							"raw": "{\r\n  \"login\": \"usuario.medico\",\r\n  \"password\": \"1234567as\"\r\n}",
 							"options": {
 								"raw": {
-									"language": "text"
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8083/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"token\": {{Token}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
 							}
 						},

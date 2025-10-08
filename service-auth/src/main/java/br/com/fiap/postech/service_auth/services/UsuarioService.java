@@ -53,6 +53,8 @@ public class UsuarioService {
         }
 
         if(usuario.getRole() != null) existente.setRole(usuario.getRole());
+        if(usuario.getEmail() != null) existente.setEmail(usuario.getEmail());
+        if(usuario.getName() != null) existente.setName(usuario.getName());
 
         existente.setActive(usuario.isActive());
 
@@ -61,6 +63,10 @@ public class UsuarioService {
 
     public Usuario findUsuarioByUsername(String username) {
         return usuarioRepository.findUsuarioByUsername(username).orElse(null);
+    }
+
+    public Usuario findById(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNaoExistenteException(id));
     }
 
     public void inativarUser(Long id){
