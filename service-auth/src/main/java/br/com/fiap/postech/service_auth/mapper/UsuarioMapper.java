@@ -13,6 +13,8 @@ public class UsuarioMapper {
 
         entity.setUsername(createRequest.username());
         entity.setPassword(createRequest.password());
+        entity.setName(createRequest.name());
+        entity.setEmail(createRequest.email());
         entity.setRole(RoleMapper.toEntity(createRequest.role()));
         entity.setActive(true);
 
@@ -27,6 +29,8 @@ public class UsuarioMapper {
         entity.setId(updateRequest.id());
         entity.setUsername(updateRequest.username());
         entity.setPassword(updateRequest.password());
+        entity.setName(updateRequest.name());
+        entity.setEmail(updateRequest.email());
         entity.setRole(RoleMapper.toEntity(updateRequest.role()));
         entity.setActive(updateRequest.active());
 
@@ -39,6 +43,8 @@ public class UsuarioMapper {
         return new UsuarioDTO.Response(
                 entity.getId(),
                 entity.getUsername(),
+                entity.getName(),
+                entity.getEmail(),
                 entity.isActive(),
                 RoleMapper.toResponse(entity.getRole())
         );
