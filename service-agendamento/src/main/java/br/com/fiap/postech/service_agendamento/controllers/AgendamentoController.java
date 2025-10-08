@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,6 +53,7 @@ public class AgendamentoController {
                     content = @Content(schema = @Schema(implementation = AgendamentoDTO.Response.class))),
             @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content)
     })
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'ENFERMERO')")
     public ResponseEntity<AgendamentoDTO.Response> criar(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação do agendamento")
                                                          @RequestBody AgendamentoDTO.CreateRequest request) {
         Agendamento novo = AgendamentoMapper.toEntity(request);
@@ -86,6 +88,7 @@ public class AgendamentoController {
                     content = @Content(schema = @Schema(implementation = AgendamentoDTO.Response.class))),
             @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content)
     })
+    @PreAuthorize("hasAnyRole('ADMIN','MEDICO')")
     public ResponseEntity<AgendamentoDTO.Response> atualizar(@Parameter(description = "ID do agendamento a ser atualizado")
                                                              @PathVariable("id") Long id,
                                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para atualização do agendamento")
@@ -105,6 +108,7 @@ public class AgendamentoController {
                     content = @Content(schema = @Schema(implementation = AgendamentoDTO.Response.class))),
             @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content)
     })
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'ENFERMERO', 'PACIENTE')")
     public ResponseEntity<AgendamentoDTO.Response> buscarPorId(@Parameter(description = "ID do agendamento")
                                                                @PathVariable("id") Long id) {
         Agendamento a = service.buscarPorId(id);
@@ -117,6 +121,7 @@ public class AgendamentoController {
             @ApiResponse(responseCode = "200", description = "Lista de agendamentos",
                     content = @Content(schema = @Schema(implementation = AgendamentoDTO.Response.class)))
     })
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'ENFERMERO', 'PACIENTE')")
     public ResponseEntity<List<AgendamentoDTO.Response>> listarPorPaciente(@Parameter(description = "ID do paciente")
                                                                            @PathVariable("pacienteId") Long pacienteId) {
         List<AgendamentoDTO.Response> lista = service.listarPorPaciente(pacienteId)
@@ -132,6 +137,7 @@ public class AgendamentoController {
             @ApiResponse(responseCode = "204", description = "Agendamento removido", content = @Content),
             @ApiResponse(responseCode = "404", description = "Agendamento não encontrado", content = @Content)
     })
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
     public void remover(@Parameter(description = "ID do agendamento a ser removido")
                         @PathVariable("id") Long id) {
         service.remover(id);
