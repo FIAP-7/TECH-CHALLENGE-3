@@ -2,24 +2,27 @@ package br.com.fiap.postech.service_notificacoes.consumer;
 
 import br.com.fiap.postech.service_notificacoes.config.RabbitMQFanoutConfig;
 import br.com.fiap.postech.service_notificacoes.dto.AgendamentoEventDTO;
-import br.com.fiap.postech.service_notificacoes.service.LembreteAutomationService;
+import br.com.fiap.postech.service_notificacoes.service.LembreteDelayService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AgendamentoConsumer {
 
-    private final LembreteAutomationService automationService;
+    private final LembreteDelayService delayService;
 
-    public AgendamentoConsumer(LembreteAutomationService automationService) {
-        this.automationService = automationService;
+    public AgendamentoConsumer(LembreteDelayService delayService) {
+        this.delayService = delayService;
     }
 
-    @RabbitListener(queues = RabbitMQFanoutConfig.LEMBRETE_QUEUE)
+    /**
+     * Ouve a fila de recebimento inicial.
+     * Esta fila está ligada ao Fanout Exchange, que recebe a mensagem do service-agendamento.
+     */
+    @RabbitListener(queues = RabbitMQFanoutConfig.INITIAL_RECEIVE_QUEUE)
     public void receiveAgendamentoEvent(AgendamentoEventDTO event) {
-        System.out.println("Evento de Agendamento recebido: " + event.getTipoEvento()
-                + " para Agendamento ID: " + event.getAgendamentoId());
+        System.out.println("Evento de Agendamento recebido (Inicial). Acionando a lógica de atraso...");
 
-        automationService.handleAgendamentoEvent(event);
+        delayService.agendarLembrete(event);
     }
 }
