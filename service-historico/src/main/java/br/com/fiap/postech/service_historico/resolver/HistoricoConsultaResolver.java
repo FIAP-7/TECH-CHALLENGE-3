@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import br.com.fiap.postech.service_historico.document.AgendamentoDocument;
@@ -19,6 +20,7 @@ public class HistoricoConsultaResolver {
         this.service = service;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'ENFERMERO', 'PACIENTE')")
     @QueryMapping
      public List<AgendamentoDocument> agendamentos(@Argument Long pacienteId ,
      @Argument Boolean somentePassados) {
@@ -37,6 +39,7 @@ public class HistoricoConsultaResolver {
         return service.findAll();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'ENFERMERO', 'PACIENTE')")
     @QueryMapping
     public AgendamentoDocument agendamentoById(@Argument(name = "id") Long id) {
         return service.findById(id);
